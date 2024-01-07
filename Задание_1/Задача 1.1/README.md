@@ -161,7 +161,7 @@ P.S. Пришлось менять в ручную названия колоно
 
 ![Screenshot from 2024-01-07 00-34-11](https://github.com/poludin/full_cycle_etl/assets/70154853/f5b9409e-7cd7-49d7-bd2d-12645b13e9dc)
 
-- Запустил DAGS - они успешно отработали и записали данные в БД.
+- Запустил DAGs - они успешно отработали и записали данные в БД.
 
   ![Screenshot from 2024-01-07 00-15-37](https://github.com/poludin/full_cycle_etl/assets/70154853/23957e84-01f5-4f36-b14e-8ce27d92ab81)
 
