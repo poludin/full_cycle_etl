@@ -22,6 +22,7 @@
 # 3. Создание Talend Job:
 
 - Создал новый Job Talend и указали имя ns_petproject.
+  
 ![Screenshot from 2024-01-04 16-53-48](https://github.com/poludin/full_cycle_etl/assets/70154853/609f0445-278e-4e79-aa16-c84b31bda82e)
 
 # 4. Добавление CSV Input компонентов:
