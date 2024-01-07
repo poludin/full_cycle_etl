@@ -1,4 +1,4 @@
-![Screenshot from 2024-01-07 00-34-11](https://github.com/poludin/full_cycle_etl/assets/70154853/960d0796-9c4a-4a89-8d82-38334275e9c6)Файлы источники - md_ledger_account_s.csv, md_account_d.csv, ft_balance_f.csv, ft_posting_f.csv, md_currency_d.csv, md_exchange_rate_d ([находятся тут](https://github.com/poludin/full_cycle_etl/tree/main/%D0%97%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%201.1/data_sources)), необходимо с помощью ETL инструмента Talend загрузить в базу данных PostgreSQL.  
+Файлы источники - md_ledger_account_s.csv, md_account_d.csv, ft_balance_f.csv, ft_posting_f.csv, md_currency_d.csv, md_exchange_rate_d ([находятся тут](https://github.com/poludin/full_cycle_etl/tree/main/%D0%97%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%201.1/data_sources)), необходимо с помощью ETL инструмента Talend загрузить в базу данных PostgreSQL.  
 
 # Шаги:
 
