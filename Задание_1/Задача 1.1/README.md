@@ -173,5 +173,4 @@ P.S. Пришлось менять в ручную названия колоно
 
 # 12. Видео по созданию/работе Job Talend и Airflow:
 
-- Видео Job Talend.
-- Видео Airlow. 
+- Видео [ETL Job Talend + Airlow](). 
