@@ -5,7 +5,7 @@
  * Создание пользователя и схемы logs(сбор логов) + предоставления привилегий 
  */
 
-create user logs with password 'logs';
+create user logs with password '*****';
 create schema logs authorization logs;
 grant all on schema logs to logs;
 grant all privileges on all tables in schema logs to logs;
@@ -58,7 +58,7 @@ insert into logs.load_logs(source, action_datetime, action) values ('md_ledger_a
  * Создение пользователя и схемы DS(детальный слой) + предоставления привилегий  
  */
 
-create user ds with password 'ds';
+create user ds with password '*****';
 create schema ds authorization ds;
 grant all on schema ds to ds;
 grant all privileges on all tables in schema ds to ds;
