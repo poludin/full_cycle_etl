@@ -10,10 +10,8 @@
 - Оборот по кредиту (в рублях и в тыс.рублей)
 
 Таблица 101-й отчётной формы (dm.dm_f101_round_f) должна быть разработана в соответствие с требованиями по формату данных, предоставленными Центробанком и расчитываться по следующей логике:
-- «Входящие остатки (в рублях/валют/итого)" - рассчитать как баланс по счетам на отчетную
-дату.
-- «Обороты за отчетный период по дебету/кредиту (в рублях/валют/итого)» - рассчитать
-как сумму всех проводок за отчетную дату по дебету/кредиту.
+- «Входящие остатки (в рублях/валют/итого)" - рассчитать как баланс по счетам на отчетную дату.
+- «Обороты за отчетный период по дебету/кредиту (в рублях/валют/итого)» - рассчитать как сумму всех проводок за отчетную дату по дебету/кредиту.
 - «Исходящие остатки (в рублях)»:
     1. Для счетов с признаком "Актив" и currency_code '643' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
     2. Для счетов с признаком "Актив" и currency_code '810' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
@@ -32,12 +30,12 @@ create schema dm;
 # 1. Создадим таблицу dm.dm_account_turnover_f
 ```sql
 create table dm.dm_account_turnover_f (
-	on_date				date,
+    on_date			date,
     account_rk 			numeric,
     credit_amount 		numeric(23, 8),
-    credit_amount_rub 	numeric(23, 8),
+    credit_amount_rub 		numeric(23, 8),
     debet_amount		numeric(23, 8),
-    debet_amount_rub	numeric(23, 8)
+    debet_amount_rub		numeric(23, 8)
 );
 ```
 # 2. Создадим прототип для таблицы dm.dm_account_turnover_f, рассчитывающий кредитовые и дебетовые обороты по счетам за каждый день января 2018 года
@@ -61,7 +59,7 @@ select
 		er.reduced_cource 				as reduced_cource,
 		p.credit_account_rk 				as account_rk,
 		p.credit_amount 				as credit_amount,
-		p.credit_amount * er.reduced_cource as credit_amount_rub,
+		p.credit_amount * er.reduced_cource 		as credit_amount_rub,
 		cast(null as numeric) 				as debet_amount,
 		cast(null as numeric)				as debet_amount_rub
 ```
@@ -103,12 +101,31 @@ group by
 В результате получим следующию таблицу:
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/0bee1ba9-35f0-4385-b741-d7612db8ed81)
 
-# 3. Создадим ррототип для таблицы dm.dm_f101_round_f
+# 4. Создадим таблицу dm.dm_f101_round_f
+```sql
+create table dm.dm_f101_round_f (
+    rep_date 				date,
+    chapter 				char(1),
+    ledger_account 			char(5),
+    characteristic 			char(1),
+    bal_in_rub				numeric(23, 8),
+    bal_in_val	 			numeric(23, 8),
+    bal_in_total			numeric(23, 8),
+    turn_deb_rub			numeric(23, 8),
+    turn_deb_val	 		numeric(23, 8),
+    turn_deb_total	 		numeric(23, 8),
+    turn_cre_rub 			numeric(23, 8),
+    turn_cre_val	 		numeric(23, 8),
+    turn_cre_total 			numeric(23, 8),
+    bal_out_rub		 		numeric(23, 8),
+    bal_out_val				numeric(23, 8),
+    bal_out_total 			numeric(23, 8)
+); 
+```
+# 4. Создадим прототип для таблицы dm.dm_f101_round_f
 Таблица будет рассчитываться по следующей логике:  
-- «Входящие остатки (в рублях/валют/итого)" - рассчитать как баланс по счетам на отчетную
-дату.
-- «Обороты за отчетный период по дебету/кредиту (в рублях/валют/итого)» - рассчитать
-как сумму всех проводок за отчетную дату по дебету/кредиту.
+- «Входящие остатки (в рублях/валют/итого)" - рассчитать как баланс по счетам на отчетную дату.
+- «Обороты за отчетный период по дебету/кредиту (в рублях/валют/итого)» - рассчитать как сумму всех проводок за отчетную дату по дебету/кредиту.
 - «Исходящие остатки (в рублях)»:
     1. Для счетов с признаком "Актив" и currency_code '643' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
     2. Для счетов с признаком "Актив" и currency_code '810' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
@@ -119,3 +136,103 @@ group by
     2. Для счетов с признаком "Пассив" и currency_code не '643' и не '810' рассчитать Входящие остатки (в валюте) + Обороты по кредиту (в валюте) - Обороты по дебету (в валюте).
 - «Исходящие остатки (итого)» рассчитать как Исходящие остатки (в валюте) + Исходящие остатки (в рублях).
 
+Будем инсертить данные в следующие столбцы:
+```sql
+insert into dm.dm_f101_round_f (
+	rep_date,
+	chapter,
+	ledger_account,
+	characteristic,
+	bal_in_rub,
+	bal_in_val,
+	bal_in_total,
+	turn_deb_rub,
+	turn_deb_val,
+	turn_deb_total,
+	turn_cre_rub,
+	turn_cre_val,
+	turn_cre_total,
+	bal_out_rub,
+	bal_out_val,
+	bal_out_total
+)
+```
+Рассчитывать данные будем сразу в SELECT. Столбцы rep_date, chapter, ledger_account, characteristic рассчитывать не нужно. А с остальными столбцами нужно будет реализовывать логику рассчета.  
+Реализуем логику - «Входящие остатки (в рублях/валют/итого)" - рассчитать как баланс по счетам на отчетную дату:
+```sql
+	--Входящие остатки в рублях
+	sum(
+		case
+			when cur.currency_code in ('643', '810')
+				then b.balance_out
+			else 0
+		end
+		) 									as bal_in_rub,
+	--Входящие остатки в валюте, переведенные в рубли
+	sum(
+		case
+			when cur.currency_code not in ('643', '810')
+				then b.balance_out * ech_r.reduced_cource
+			else 0
+		end
+		) 									as bal_in_val,
+	--Итого:Входящие остатки в рублях + Входящие остатки в валюте, переведенные в рубли 
+	sum(
+		case 
+			when cur.currency_code in ('643', '810')
+				then b.balance_out
+			else b.balance_out * ech_r.reduced_cource
+		end
+		) 									as bal_in_total
+```
+Реализуем логику - «Обороты за отчетный период по дебету/кредиту (в рублях/валют/итого)» - рассчитать как сумму всех проводок за отчетную дату по дебету/кредиту:
+```sql
+	--Обороты за отчетный период по дебету в рублях
+	sum(
+		case 
+			when cur.currency_code in ('643', '810')
+				then at.debet_amount_rub
+			else 0
+		end
+	) 										as turn_deb_rub,
+	--Обороты за отчетный период по дебету в валюте, переведенный в рубли 
+	sum(
+		case
+			when cur.currency_code not in ('643', '810')
+				then at.debet_amount_rub * ech_r.reduced_cource
+			else 0
+		end
+		) 									as turn_deb_val,
+	--Итого: Обороты за отчетный период по дебету в рублях + Обороты за отчетный период по дебету в валюте, переведенный в рубли 
+	 sum(
+		case 
+			when cur.currency_code in ('643', '810')
+				then at.debet_amount_rub
+			else at.debet_amount_rub * ech_r.reduced_cource
+		end
+		) 									as turn_deb_total,
+	--Обороты за отчетный период по кредиту в рублях
+	sum(
+		case 
+			when cur.currency_code in ('643', '810')
+				then at.credit_amount_rub
+			else 0
+		end
+	) 										as turn_cre_rub,
+	--Обороты за отчетный период по кредиту в валюте, переведенный в рубли
+	sum(
+		case
+			when cur.currency_code not in ('643', '810')
+				then at.credit_amount_rub * ech_r.reduced_cource
+			else 0
+		end
+		) 									as turn_cre_val,
+	--Итого: Обороты за отчетный период по кредиту в рублях + Обороты за отчетный период по кредиту в валюте, переведенный в рубли 
+	 sum(
+		case 
+			when cur.currency_code in ('643', '810')
+				then at.credit_amount_rub
+			else at.credit_amount_rub * ech_r.reduced_cource
+		end
+		) 									as turn_cre_total
+```
