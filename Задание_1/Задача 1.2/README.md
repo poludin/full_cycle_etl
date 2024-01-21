@@ -75,7 +75,7 @@ select
 		p.debet_amount 					as debet_amount,
 		p.debet_amount * er.reduced_cource 	        as debet_amount_rub
 ```
-Данные будет брать из таблиц, которые объединили с помощью JOIN и по условию дату между 2018-01-01 и 2018-02-01:
+Данные будем брать из таблиц, которые объединили с помощью JOIN и по условию дату между 2018-01-01 и 2018-02-01:
 ```sql
 from ds.ft_posting_f p
 	join ds.md_account_d a on p.credit_account_rk = a.account_rk
@@ -236,3 +236,76 @@ insert into dm.dm_f101_round_f (
 		end
 		) 									as turn_cre_total
 ```
+Реализуем логику - «Исходящие остатки (в рублях)»:
+    1. Для счетов с признаком "Актив" и currency_code '643' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
+    2. Для счетов с признаком "Актив" и currency_code '810' рассчитать как Входящие остатки (в руб.) - Обороты по кредиту (в руб.) + Обороты по дебету (в руб.).
+    3. Для счетов с признаком "Пассив" и currency_code '643' рассчитать как Входящие остатки (в руб.) + Обороты по кредиту (в руб.) - Обороты по дебету (в руб.).
+    4. Для счетов с признаком "Пассив" и currency_code '810' рассчитать как Входящие остатки (в руб.) + Обороты по кредиту (в руб.) - Обороты по дебету (в руб.):
+```sql
+sum(
+		case
+			when cur.currency_code in ('643', '840') and s.characteristic = 'А'
+				then b.balance_out - at.credit_amount_rub + at.debet_amount_rub
+			when cur.currency_code in ('643', '840') and s.characteristic = 'П'
+				then b.balance_out + at.credit_amount_rub - at.debet_amount_rub
+			else 0
+		end
+	) 										as bal_out_rub
+```
+Реализуем логику - «Исходящие остатки (в валюте)»:
+    1. Для счетов с признаком "Актив" и currency_code не '643' и не '810' рассчитать как Входящие остатки (в валюте) - Обороты по кредиту (в валюте) + Обороты по дебету (в валюте).
+    2. Для счетов с признаком "Пассив" и currency_code не '643' и не '810' рассчитать Входящие остатки (в валюте) + Обороты по кредиту (в валюте) - Обороты по дебету (в валюте):
+```sql
+sum(
+		case
+			when cur.currency_code not in ('643', '840') and s.characteristic = 'А'
+				then b.balance_out * ech_r.reduced_cource - at.credit_amount_rub * ech_r.reduced_cource + at.debet_amount_rub * ech_r.reduced_cource
+			when cur.currency_code in ('643', '840') and s.characteristic = 'П'
+				then b.balance_out * ech_r.reduced_cource + at.credit_amount_rub * ech_r.reduced_cource - at.debet_amount_rub * ech_r.reduced_cource
+			else 0
+		end
+	) 										as bal_out_val
+```
+Реализуем логику - - «Исходящие остатки (итого)» рассчитать как Исходящие остатки (в валюте) + Исходящие остатки (в рублях):
+```sql
+sum(
+		case
+			when cur.currency_code in ('643', '840') and s.characteristic = 'А'
+				then b.balance_out - at.credit_amount_rub + at.debet_amount_rub
+			when cur.currency_code in ('643', '840') and s.characteristic = 'П'
+				then b.balance_out + at.credit_amount_rub - at.debet_amount_rub
+			else 0
+		end
+	) + sum(
+		case
+			when cur.currency_code not in ('643', '840') and s.characteristic = 'А'
+				then b.balance_out * ech_r.reduced_cource - at.credit_amount_rub * ech_r.reduced_cource + at.debet_amount_rub * ech_r.reduced_cource
+			when cur.currency_code in ('643', '840') and s.characteristic = 'П'
+				then b.balance_out * ech_r.reduced_cource + at.credit_amount_rub * ech_r.reduced_cource - at.debet_amount_rub * ech_r.reduced_cource
+			else 0
+		end
+	) 										as bal_out_total
+```
+Данные будем брать из таблиц, которые объединили с помощью JOIN с последующей группировкой:
+```sql
+from ds.md_ledger_account_s s
+join ds.md_account_d acc_d 
+	on s.ledger_account = substring(acc_d.account_number, 1, 5)::int
+join ds.md_currency_d cur
+	on acc_d.currency_rk = cur.currency_rk 
+join ds.ft_balance_f b 
+	on acc_d.account_rk = b.account_rk
+left join ds.md_exchange_rate_d ech_r 
+	on acc_d.currency_rk = ech_r.currency_rk
+left join dm.dm_account_turnover_f at
+	on acc_d.account_rk = at.account_rk
+group by 
+	at.on_date,
+	s.chapter,
+	acc_d.account_number,
+	acc_d.char_type
+```
+В результате получили таблицу с нужными данными:
+![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/f2264bbf-998d-4dd1-9bd4-f58729c58abf)  
+
+Полный sql-скрипт можно посмотреть [тут](https://github.com/poludin/project_full_cycle_etl/blob/main/%D0%97%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%201.2/task_1_2.sql).
