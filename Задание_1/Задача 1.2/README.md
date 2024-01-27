@@ -101,7 +101,7 @@ group by
 В результате получим следующию таблицу:
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/0bee1ba9-35f0-4385-b741-d7612db8ed81)
 
-# 4. Создадим таблицу dm.dm_f101_round_f
+# 3. Создадим таблицу dm.dm_f101_round_f
 ```sql
 create table dm.dm_f101_round_f (
     rep_date 				date,
