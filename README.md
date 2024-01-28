@@ -16,11 +16,11 @@
 хранилища в СУБД Oracle / PostgreSQL.
 
 # Перечень технологий:
-- OS Ubuntu 20.04
-- PostgreSQL 15.5
-- Python 3.9
-- Airflow 2.6
-- DBeaver 23.3.1
-- Talend 7.3
+- OS Ubuntu
+- PostgreSQL
+- Python
+- Airflow
+- DBeaver
+- Talend
 - Spark
 - Yarn
