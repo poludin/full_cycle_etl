@@ -22,3 +22,5 @@
 - Airflow 2.6
 - DBeaver 23.3.1
 - Talend 7.3
+- Spark
+- Yarn
