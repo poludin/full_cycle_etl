@@ -19,6 +19,7 @@
 - OS Ubuntu
 - PostgreSQL
 - Python
+- Jupyter Notebook
 - Airflow
 - DBeaver
 - Talend
