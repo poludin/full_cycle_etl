@@ -5,7 +5,7 @@
 Поменяем пару значений в выгруженном csv-файле и загрузим его в копию таблицы 101-формы «dm.dm _f101_round_f_v2».
 
 # Шаги:
-# 0. Создадим копию таблицы dm.dm _f101_round_f dm - dm.dm _f101_round_f_v2
+# 0. Создадим копию таблицы dm.dm _f101_round_f - dm.dm _f101_round_f_v2
 ```sql
 create table dm.dm_f101_round_f_v2 (
     rep_date 		                date,
@@ -26,7 +26,8 @@ create table dm.dm_f101_round_f_v2 (
     bal_out_total 			numeric(23, 8)
 );
 ```
-В эту таблицу будем загружать изменные данные с витирины dm.dm _f101_round_f.
+В эту таблицу будем загружать изменные данные с витирины «dm.dm _f101_round_f».
+
 # 1. Создадим скрипт для экспорта и импорта данных  
 Для создания скрипта будем использовать Python Jupyter Notebook.  
 Создадим файл task_1.3.ipynb. В нем создадим две функции - импорт и экспорт данных.
@@ -83,7 +84,7 @@ def export_data_to_csv():
             cursor.close()
             conn.close()
 ```
-Вызовим функцию для выполнения выгрузки данных:
+Вызовим функцию для выполнения выгрузки данных из базы данных:
 ```python
 export_data_to_csv()
 ```
@@ -91,5 +92,40 @@ export_data_to_csv()
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/b06e040e-99ba-401a-9f2d-4fd1070f3b3b)
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/81327b0d-5a47-46e9-bc1a-7d8395872b23)
 
+Изменим пару значений в выгруженном файле data_export.csv:
+![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/9bfbc8c7-7d4a-4f07-ab4e-d663a52c95d2)
+
+Импортрируем данные из CSV-файла в таблицу dm.dm _f101_round_f_v2 с помощью функции:
+```python
+def import_data_from_csv():
+    try:
+        conn = psycopg2.connect(host=db_host, port=db_port, dbname=db_name, user=db_user, password=db_password)
+        cursor = conn.cursor()
+
+        # Очистка таблицы перед импортом данных
+        cursor.execute("TRUNCATE TABLE dm.dm_f101_round_f_v2")
+
+        # Чтение данных из CSV-файла
+        with open('data_export.csv', 'r') as f:
+            cursor.copy_expert("COPY dm.dm_f101_round_f_v2 FROM STDIN WITH (FORMAT CSV, HEADER)", f)
+    
+        conn.commit()
+        logging.info("Data imported from CSV successfully")
+
+    except (Exception, psycopg2.Error) as error:
+        logging.error("Error importing data from CSV: " + str(error))
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+```
+Вызовим функцию для выполнения загрузки данных в базу данных:
+```python
+import_data_from_csv()
+```
+В результате измененные данные загрузятся в базу данных в таблицу dm.dm _f101_round_f_v2 и запишиться лог в файл data_migration.log о успешной загрузки данных:
+![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/eb7d7625-e0ac-4f3b-bce9-144988f4b616)
+![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/7285a5fc-7ca6-48e9-9912-d500de785c65)
 
 
