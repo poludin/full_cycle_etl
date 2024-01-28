@@ -128,4 +128,4 @@ import_data_from_csv()
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/eb7d7625-e0ac-4f3b-bce9-144988f4b616)
 ![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/7285a5fc-7ca6-48e9-9912-d500de785c65)
 
-
+Файл с кодом можно посмотреть [тут](https://github.com/poludin/project_full_cycle_etl/blob/main/%D0%97%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_1/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%201.3/task_1.3.ipynb).
