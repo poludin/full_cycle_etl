@@ -19,34 +19,70 @@
 Результат сохранить в формате parquet.
 
 # Шаги:
-# 0. Создадим копию таблицы dm.dm _f101_round_f - dm.dm _f101_round_f_v2
-```sql
-create table dm.dm_f101_round_f_v2 (
-    rep_date 		                date,
-    chapter 				char(1),
-    ledger_account 			char(5),
-    characteristic 			char(1),
-    bal_in_rub				numeric(23, 8),
-    bal_in_val	 			numeric(23, 8),
-    bal_in_total			numeric(23, 8),
-    turn_deb_rub			numeric(23, 8),
-    turn_deb_val	 		numeric(23, 8),
-    turn_deb_total	 		numeric(23, 8),
-    turn_cre_rub 			numeric(23, 8),
-    turn_cre_val	 		numeric(23, 8),
-    turn_cre_total 			numeric(23, 8),
-    bal_out_rub		 		numeric(23, 8),
-    bal_out_val				numeric(23, 8),
-    bal_out_total 			numeric(23, 8)
-);
-```
-В эту таблицу будем загружать изменные данные с витирины «dm.dm _f101_round_f».
-
-# 1. Создадим скрипт для экспорта и импорта данных  
-Для создания скрипта будем использовать Python Jupyter Notebook.  
-Создадим файл task_1.3.ipynb. В нем создадим две функции - импорт и экспорт данных.
-
-Сначала импортируем неоходимые библиотеки:
+# 0. Импортируем необходимые библиотеки для работы
 ```python
-import csv
-import psycopg2
+import os
+import pyspark
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+from pyspark.sql import SparkSession
+from pyspark import SparkConf
+from pyspark import  SparkContext
+from pyspark.sql import functions as f
+from pyspark.sql.functions import col
+```
+
+# 1. Выполним первое задание  
+Сгенерировать DataFrame из трёх колонок (row_id, discipline, season) - олимпийские дисциплины по сезонам:
+
+row_id - число порядкового номера строки;
+discipline - наименование олимпийский дисциплины на английском (полностью маленькими буквами);
+season - сезон дисциплины (summer / winter).
+*Укажите не менее чем по 5 дисциплин для каждого сезона.
+Сохраните DataFrame в csv-файл, разделитель колонок табуляция, первая строка должна содержать название колонок.
+Данные должны быть сохранены в виде 1 csv-файла а не множества маленьких.
+
+Создадим DataFrame с олимпийскими дисциплинами:
+```python
+data = {
+    'row_id': range(1, 11),
+    'discipline': ['athletics', 'swimming', 'basketball', 'football', 'tennis', 'skiing', \
+                   'hockey', 'figure_skating', 'snowboarding', 'curling'],
+    'season': ['summer'] * 5 + ['winter'] * 5
+}
+```
+Заполним DataFrame данными:
+```python
+{'row_id': range(1, 11),
+ 'discipline': ['athletics',
+  'swimming',
+  'basketball',
+  'football',
+  'tennis',
+  'skiing',
+  'hockey',
+  'figure_skating',
+  'snowboarding',
+  'curling'],
+ 'season': ['summer',
+  'summer',
+  'summer',
+  'summer',
+  'summer',
+  'winter',
+  'winter',
+  'winter',
+  'winter',
+  'winter']}
+```
+Запишем в переменную olympic_disciplines наши данные и выведим их:
+```python
+olympic_disciplines = pd.DataFrame(data)
+
+olympic_disciplines
+```
+
+![image](https://github.com/poludin/project_full_cycle_etl/assets/70154853/b020b4db-5c26-46d6-9dd6-f4d289f310ec)
+
+
