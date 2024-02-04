@@ -171,4 +171,4 @@ print("Итоговый результат сохранен в файл final_re
 
 Итоговый результат сохранен в файл final_result.parquet
 ```
-
+Все данные можно посмотреть в директории "Задание 2.1", а полный скрипт файла [тут](https://github.com/poludin/project_full_cycle_etl/blob/main/%D0%97%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5_2/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%202.1/task_2.1.ipynb).
