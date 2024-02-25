@@ -9,12 +9,12 @@ create schema dm;
  */
 
 create table dm.dm_account_turnover_f (
-	on_date				date,
-    account_rk 			numeric,
-    credit_amount 		numeric(23, 8),
-    credit_amount_rub 	numeric(23, 8),
-    debet_amount		numeric(23, 8),
-    debet_amount_rub	numeric(23, 8)
+	on_date			date,
+	account_rk 		numeric,
+    	credit_amount 		numeric(23, 8),
+    	credit_amount_rub 	numeric(23, 8),
+    	debet_amount		numeric(23, 8),
+    	debet_amount_rub	numeric(23, 8)
 );
 
 
@@ -36,10 +36,10 @@ with wt_turn as
 	select
 		date(p.oper_date)    				as oper_date,
 		er.data_actual_date 				as exchange_rate,
-		er.reduced_cource 					as reduced_cource,
+		er.reduced_cource 				as reduced_cource,
 		p.credit_account_rk 				as account_rk,
-		p.credit_amount 					as credit_amount,
-		p.credit_amount * er.reduced_cource as credit_amount_rub,
+		p.credit_amount 				as credit_amount,
+		p.credit_amount * er.reduced_cource 		as credit_amount_rub,
 		cast(null as numeric) 				as debet_amount,
 		cast(null as numeric)				as debet_amount_rub
 	from ds.ft_posting_f p
@@ -52,12 +52,12 @@ with wt_turn as
 	select
 		date(p.oper_date)    				as oper_date,
 		er.data_actual_date 				as exchange_rate,
-		er.reduced_cource 					as reduced_cource,
+		er.reduced_cource 				as reduced_cource,
 		p.credit_account_rk 				as account_rk,
 		cast(null as numeric) 				as credit_amount,
 		cast(null as numeric)				as credit_amount_rub,
-		p.debet_amount 						as debet_amount,
-		p.debet_amount * er.reduced_cource 	as debet_amount_rub
+		p.debet_amount 					as debet_amount,
+		p.debet_amount * er.reduced_cource 		as debet_amount_rub
 	from ds.ft_posting_f p
 	join ds.md_account_d a on p.credit_account_rk = a.account_rk
 	left join ds.md_exchange_rate_d er 
@@ -66,8 +66,8 @@ with wt_turn as
 	where date(p.oper_date) = er.data_actual_date
 )
 select
-	t.oper_date								as on_date,
-	t.account_rk 							as account_rk,
+	t.oper_date						as on_date,
+	t.account_rk 						as account_rk,
 	sum(t.credit_amount) 					as credit_amount,
 	sum(t.credit_amount_rub) 				as credit_amount_rub,
 	sum(t.debet_amount) 					as debet_amount,
@@ -87,7 +87,7 @@ select * from dm.dm_account_turnover_f order by on_date, account_rk;
  */
 
 create table dm.dm_f101_round_f (
-	rep_date 				date,
+    rep_date 				date,
     chapter 				char(1),
     ledger_account 			char(5),
     characteristic 			char(1),
@@ -139,10 +139,10 @@ insert into dm.dm_f101_round_f (
 )
 
 select
-	at.on_date 								as rep_date,
-	s.chapter 								as chapter,
-	substring(acc_d.account_number, 1, 5) 	as ledger_account,
-	acc_d.char_type 						as characteristic,
+	at.on_date 									as rep_date,
+	s.chapter 									as chapter,
+	substring(acc_d.account_number, 1, 5) 						as ledger_account,
+	acc_d.char_type 								as characteristic,
 	--RUB balance
 	sum(
 		case
