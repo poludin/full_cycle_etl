@@ -16,10 +16,10 @@ grant all privileges on all tables in schema logs to logs;
  */
 
 create table logs.load_logs (
-	row_change_time timestamp default current_timestamp,
-	source 		varchar(50),
-	action_datetime timestamp,
-	action 		varchar(50)
+	row_change_time 	timestamp default current_timestamp,
+	source 			varchar(50),
+	action_datetime 	timestamp,
+	action 			varchar(50)
 );
 
 --truncate table logs.load_logs; 	
